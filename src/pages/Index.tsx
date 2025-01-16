@@ -18,7 +18,7 @@ const Index = () => {
 
   const testimonials = [
     {
-      text: "Odysee has transformed how I work. The AI responses are incredibly precise and helpful.",
+      text: "Odysee has transformed how I work. The responses are incredibly precise and helpful.",
       author: "Sarah Johnson",
       role: "Software Developer"
     },
@@ -35,10 +35,10 @@ const Index = () => {
   ];
 
   const stats = [
-    { value: "99%", label: "Accuracy Rate" },
+    { value: "95%", label: "Response Rate" },
     { value: "24/7", label: "Availability" },
-    { value: "100+", label: "Programming Languages" },
-    { value: "1M+", label: "Daily Conversations" }
+    { value: "20+", label: "Languages" },
+    { value: "10k+", label: "Users" }
   ];
 
   return (
@@ -47,7 +47,7 @@ const Index = () => {
       <div className="container mx-auto px-4 py-20">
         <div className="text-center space-y-8 animate-fade-in">
           <div className="flex justify-center">
-            <Bot className="w-20 h-20 text-primary animate-pulse" />
+            <Bot className="w-20 h-20 text-gray-300 animate-pulse" />
           </div>
           <h1 className="text-4xl md:text-6xl font-bold text-white">
             Meet Odysee Gen 1
@@ -57,13 +57,13 @@ const Index = () => {
           </p>
           <div className="flex justify-center gap-4">
             <Link to="/chat">
-              <Button size="lg" className="animate-scale-in">
+              <Button size="lg" className="bg-gray-700 hover:bg-gray-600 text-white">
                 <MessageSquare className="mr-2" />
                 Start Chatting
               </Button>
             </Link>
             <Link to="/features">
-              <Button size="lg" variant="outline" className="animate-scale-in">
+              <Button size="lg" variant="outline" className="text-gray-300 border-gray-600 hover:bg-gray-800">
                 Learn More
                 <ArrowRight className="ml-2" />
               </Button>
@@ -80,7 +80,7 @@ const Index = () => {
               key={index}
               className="text-center p-6 bg-gray-800/30 rounded-lg backdrop-blur-sm"
             >
-              <div className="text-3xl font-bold text-primary mb-2">{stat.value}</div>
+              <div className="text-3xl font-bold text-gray-200 mb-2">{stat.value}</div>
               <div className="text-gray-400">{stat.label}</div>
             </div>
           ))}
@@ -92,24 +92,24 @@ const Index = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {[
             {
-              icon: <MessageSquare className="w-8 h-8 text-primary" />,
+              icon: <MessageSquare className="w-8 h-8 text-gray-300" />,
               title: "Natural Conversations",
               description: "Engage in fluid, context-aware conversations with advanced language understanding."
             },
             {
-              icon: <Code className="w-8 h-8 text-primary" />,
+              icon: <Code className="w-8 h-8 text-gray-300" />,
               title: "Code Support",
               description: "Get help with coding questions with syntax highlighting and markdown support."
             },
             {
-              icon: <Sparkles className="w-8 h-8 text-primary" />,
+              icon: <Sparkles className="w-8 h-8 text-gray-300" />,
               title: "Smart Responses",
               description: "Powered by state-of-the-art AI to provide accurate and helpful information."
             }
           ].map((feature, index) => (
             <div 
               key={index}
-              className="p-6 bg-gray-800/50 rounded-lg backdrop-blur-sm border border-gray-700 hover:border-primary transition-colors animate-fade-in"
+              className="p-6 bg-gray-800/50 rounded-lg backdrop-blur-sm border border-gray-700 hover:border-gray-500 transition-colors animate-fade-in"
               style={{ animationDelay: `${index * 100}ms` }}
             >
               <div className="space-y-4">
@@ -128,17 +128,17 @@ const Index = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {[
             {
-              icon: <Users className="w-12 h-12 text-primary" />,
+              icon: <Users className="w-12 h-12 text-gray-300" />,
               title: "1. Start a Conversation",
               description: "Begin chatting with Odysee about any topic or problem you need help with."
             },
             {
-              icon: <Brain className="w-12 h-12 text-primary" />,
+              icon: <Brain className="w-12 h-12 text-gray-300" />,
               title: "2. AI Processing",
               description: "Our advanced AI analyzes your input and generates relevant, contextual responses."
             },
             {
-              icon: <Zap className="w-12 h-12 text-primary" />,
+              icon: <Zap className="w-12 h-12 text-gray-300" />,
               title: "3. Get Smart Solutions",
               description: "Receive accurate, helpful answers and solutions tailored to your needs."
             }
@@ -147,7 +147,7 @@ const Index = () => {
               {step.icon}
               <h3 className="text-xl font-semibold text-white">{step.title}</h3>
               <p className="text-gray-400">{step.description}</p>
-              {index < 2 && <ChevronRight className="hidden md:block text-primary transform rotate-90 md:rotate-0 mt-4" />}
+              {index < 2 && <ChevronRight className="hidden md:block text-gray-500 transform rotate-90 md:rotate-0 mt-4" />}
             </div>
           ))}
         </div>
@@ -176,7 +176,7 @@ const Index = () => {
                     key={index}
                     onClick={() => setActiveTestimonial(index)}
                     className={`w-3 h-3 rounded-full transition-colors ${
-                      index === activeTestimonial ? 'bg-primary' : 'bg-gray-600'
+                      index === activeTestimonial ? 'bg-gray-300' : 'bg-gray-600'
                     }`}
                   />
                 ))}
@@ -188,13 +188,13 @@ const Index = () => {
 
       {/* CTA Section */}
       <div className="container mx-auto px-4 py-20">
-        <div className="bg-gradient-to-r from-primary/20 to-primary/10 rounded-2xl p-12 text-center">
+        <div className="bg-gray-800/50 rounded-2xl p-12 text-center border border-gray-700">
           <h2 className="text-3xl font-bold text-white mb-6">Ready to Experience the Future?</h2>
           <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
-            Join thousands of users who are already transforming their work with Odysee Gen 1.
+            Join our growing community of users who are already transforming their work with Odysee Gen 1.
           </p>
           <Link to="/chat">
-            <Button size="lg" className="animate-scale-in">
+            <Button size="lg" className="bg-gray-700 hover:bg-gray-600 text-white">
               Get Started Now
               <ArrowRight className="ml-2" />
             </Button>
@@ -215,17 +215,17 @@ const Index = () => {
             <div>
               <h3 className="text-white font-semibold mb-4">Quick Links</h3>
               <div className="space-y-2">
-                <Link to="/features" className="block text-gray-400 hover:text-primary">Features</Link>
-                <Link to="/pricing" className="block text-gray-400 hover:text-primary">Pricing</Link>
-                <Link to="/docs" className="block text-gray-400 hover:text-primary">Documentation</Link>
+                <Link to="/features" className="block text-gray-400 hover:text-gray-300">Features</Link>
+                <Link to="/pricing" className="block text-gray-400 hover:text-gray-300">Pricing</Link>
+                <Link to="/docs" className="block text-gray-400 hover:text-gray-300">Documentation</Link>
               </div>
             </div>
             <div>
               <h3 className="text-white font-semibold mb-4">Connect</h3>
               <div className="space-y-2">
-                <a href="#" className="block text-gray-400 hover:text-primary">Twitter</a>
-                <a href="#" className="block text-gray-400 hover:text-primary">LinkedIn</a>
-                <a href="#" className="block text-gray-400 hover:text-primary">GitHub</a>
+                <a href="#" className="block text-gray-400 hover:text-gray-300">Twitter</a>
+                <a href="#" className="block text-gray-400 hover:text-gray-300">LinkedIn</a>
+                <a href="#" className="block text-gray-400 hover:text-gray-300">GitHub</a>
               </div>
             </div>
           </div>
