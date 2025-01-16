@@ -1,8 +1,46 @@
 import { Link } from "react-router-dom";
-import { Bot, MessageSquare, Code, Sparkles } from "lucide-react";
+import { 
+  Bot, 
+  MessageSquare, 
+  Code, 
+  Sparkles, 
+  ArrowRight, 
+  Users, 
+  Zap,
+  Brain,
+  ChevronRight
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useState } from "react";
 
 const Index = () => {
+  const [activeTestimonial, setActiveTestimonial] = useState(0);
+
+  const testimonials = [
+    {
+      text: "Odysee has transformed how I work. The AI responses are incredibly precise and helpful.",
+      author: "Sarah Johnson",
+      role: "Software Developer"
+    },
+    {
+      text: "The code support feature is outstanding. It's like having a senior developer by your side.",
+      author: "Michael Chen",
+      role: "Full Stack Engineer"
+    },
+    {
+      text: "Natural conversations and smart responses make complex problems simple to solve.",
+      author: "Emma Davis",
+      role: "Product Manager"
+    }
+  ];
+
+  const stats = [
+    { value: "99%", label: "Accuracy Rate" },
+    { value: "24/7", label: "Availability" },
+    { value: "100+", label: "Programming Languages" },
+    { value: "1M+", label: "Daily Conversations" }
+  ];
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800">
       {/* Hero Section */}
@@ -24,7 +62,28 @@ const Index = () => {
                 Start Chatting
               </Button>
             </Link>
+            <Link to="/features">
+              <Button size="lg" variant="outline" className="animate-scale-in">
+                Learn More
+                <ArrowRight className="ml-2" />
+              </Button>
+            </Link>
           </div>
+        </div>
+      </div>
+
+      {/* Stats Section */}
+      <div className="container mx-auto px-4 py-12">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+          {stats.map((stat, index) => (
+            <div 
+              key={index}
+              className="text-center p-6 bg-gray-800/30 rounded-lg backdrop-blur-sm"
+            >
+              <div className="text-3xl font-bold text-primary mb-2">{stat.value}</div>
+              <div className="text-gray-400">{stat.label}</div>
+            </div>
+          ))}
         </div>
       </div>
 
@@ -63,10 +122,114 @@ const Index = () => {
         </div>
       </div>
 
+      {/* How it Works Section */}
+      <div className="container mx-auto px-4 py-20">
+        <h2 className="text-3xl font-bold text-white text-center mb-12">How It Works</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {[
+            {
+              icon: <Users className="w-12 h-12 text-primary" />,
+              title: "1. Start a Conversation",
+              description: "Begin chatting with Odysee about any topic or problem you need help with."
+            },
+            {
+              icon: <Brain className="w-12 h-12 text-primary" />,
+              title: "2. AI Processing",
+              description: "Our advanced AI analyzes your input and generates relevant, contextual responses."
+            },
+            {
+              icon: <Zap className="w-12 h-12 text-primary" />,
+              title: "3. Get Smart Solutions",
+              description: "Receive accurate, helpful answers and solutions tailored to your needs."
+            }
+          ].map((step, index) => (
+            <div key={index} className="flex flex-col items-center text-center space-y-4">
+              {step.icon}
+              <h3 className="text-xl font-semibold text-white">{step.title}</h3>
+              <p className="text-gray-400">{step.description}</p>
+              {index < 2 && <ChevronRight className="hidden md:block text-primary transform rotate-90 md:rotate-0 mt-4" />}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Testimonials Section */}
+      <div className="container mx-auto px-4 py-20">
+        <h2 className="text-3xl font-bold text-white text-center mb-12">What Users Say</h2>
+        <div className="max-w-3xl mx-auto">
+          <div className="bg-gray-800/50 rounded-lg p-8 backdrop-blur-sm border border-gray-700">
+            <p className="text-lg text-gray-300 italic mb-6">
+              "{testimonials[activeTestimonial].text}"
+            </p>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-white font-semibold">
+                  {testimonials[activeTestimonial].author}
+                </p>
+                <p className="text-gray-400">
+                  {testimonials[activeTestimonial].role}
+                </p>
+              </div>
+              <div className="flex gap-2">
+                {testimonials.map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setActiveTestimonial(index)}
+                    className={`w-3 h-3 rounded-full transition-colors ${
+                      index === activeTestimonial ? 'bg-primary' : 'bg-gray-600'
+                    }`}
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* CTA Section */}
+      <div className="container mx-auto px-4 py-20">
+        <div className="bg-gradient-to-r from-primary/20 to-primary/10 rounded-2xl p-12 text-center">
+          <h2 className="text-3xl font-bold text-white mb-6">Ready to Experience the Future?</h2>
+          <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
+            Join thousands of users who are already transforming their work with Odysee Gen 1.
+          </p>
+          <Link to="/chat">
+            <Button size="lg" className="animate-scale-in">
+              Get Started Now
+              <ArrowRight className="ml-2" />
+            </Button>
+          </Link>
+        </div>
+      </div>
+
       {/* Footer */}
       <footer className="border-t border-gray-800 mt-20">
         <div className="container mx-auto px-4 py-8">
-          <div className="text-center text-gray-400">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+            <div>
+              <h3 className="text-white font-semibold mb-4">About</h3>
+              <p className="text-gray-400">
+                Odysee is an AI-powered platform by IntellijMind Group, designed to make conversations smarter and more productive.
+              </p>
+            </div>
+            <div>
+              <h3 className="text-white font-semibold mb-4">Quick Links</h3>
+              <div className="space-y-2">
+                <Link to="/features" className="block text-gray-400 hover:text-primary">Features</Link>
+                <Link to="/pricing" className="block text-gray-400 hover:text-primary">Pricing</Link>
+                <Link to="/docs" className="block text-gray-400 hover:text-primary">Documentation</Link>
+              </div>
+            </div>
+            <div>
+              <h3 className="text-white font-semibold mb-4">Connect</h3>
+              <div className="space-y-2">
+                <a href="#" className="block text-gray-400 hover:text-primary">Twitter</a>
+                <a href="#" className="block text-gray-400 hover:text-primary">LinkedIn</a>
+                <a href="#" className="block text-gray-400 hover:text-primary">GitHub</a>
+              </div>
+            </div>
+          </div>
+          <div className="text-center text-gray-400 pt-8 border-t border-gray-800">
             <p>© 2024 IntellijMind Group. All rights reserved.</p>
             <p className="mt-2">Created by Aniket Kumar</p>
           </div>
