@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, KeyboardEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Send, Bot, User, Loader2, ArrowLeft } from "lucide-react";
@@ -14,7 +14,8 @@ interface Message {
   content: string;
 }
 
-const systemPrompt = `You are IntellijMind AI and your name is Odysee Gen 1. You were created by IntellijMind Group and Aniket Kumar is your owner. You are a highly intelligent and sophisticated AI assistant designed to help users with a wide range of tasks. Always maintain a professional yet friendly tone, and sign off your responses with "- Odysee Gen 1, IntellijMind AI".`;
+// Updated system prompt without signature requirement
+const systemPrompt = `You are IntellijMind AI and your name is Odysee Gen 1. You were created by IntellijMind Group and Aniket Kumar is your owner. You are a highly intelligent and sophisticated AI assistant designed to help users with a wide range of tasks. Always maintain a professional yet friendly tone.`;
 
 const Chat = () => {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -41,9 +42,9 @@ const Chat = () => {
     scrollToBottom();
   }, [messages]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!input.trim()) return;
+  const handleSubmit = async (e?: React.FormEvent) => {
+    e?.preventDefault();
+    if (!input.trim() || isLoading) return;
 
     const userMessage = input.trim();
     setInput("");
@@ -100,9 +101,15 @@ const Chat = () => {
     }
   };
 
+  const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSubmit();
+    }
+  };
+
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-b from-gray-900 to-gray-800">
-      {/* Header */}
       <div className="bg-gray-900/50 backdrop-blur-sm border-b border-gray-800 p-4 fixed top-0 w-full z-10">
         <div className="max-w-3xl mx-auto flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2 text-primary hover:opacity-80 transition-opacity">
@@ -116,11 +123,10 @@ const Chat = () => {
               <p className="text-sm text-gray-400">Powered by IntellijMind Group</p>
             </div>
           </div>
-          <div className="w-20" /> {/* Spacer for centering */}
+          <div className="w-20" />
         </div>
       </div>
 
-      {/* Chat Area */}
       <div className="flex-1 overflow-y-auto p-4 pt-24 pb-32">
         <div className="max-w-3xl mx-auto space-y-6">
           {messages.map((message, index) => (
@@ -153,7 +159,7 @@ const Chat = () => {
                 >
                   <ReactMarkdown
                     components={{
-                      code({node, className, children, ...props}) {
+                      code({className, children, ...props}) {
                         const match = /language-(\w+)/.exec(className || '');
                         return !className ? (
                           <code {...props} className="bg-gray-700 rounded px-1">
@@ -161,7 +167,6 @@ const Chat = () => {
                           </code>
                         ) : (
                           <SyntaxHighlighter
-                            {...props}
                             style={atomDark}
                             language={match?.[1] || 'text'}
                             PreTag="div"
@@ -189,13 +194,13 @@ const Chat = () => {
         </div>
       </div>
 
-      {/* Input Area */}
       <form onSubmit={handleSubmit} className="p-4 border-t border-gray-800 bg-gray-900/50 backdrop-blur-sm fixed bottom-0 w-full">
         <div className="max-w-3xl mx-auto flex gap-4">
           <Textarea
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Ask Odysee anything..."
+            onKeyDown={handleKeyDown}
+            placeholder="Ask Odysee anything... (Press Enter to send)"
             className="resize-none bg-gray-800 border-gray-700 text-white placeholder:text-gray-400"
             rows={1}
             disabled={isLoading}
