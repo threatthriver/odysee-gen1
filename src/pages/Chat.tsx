@@ -17,6 +17,17 @@ const Chat = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
+  useEffect(() => {
+    // Set the API token in localStorage when component mounts
+    if (!localStorage.getItem("HF_TOKEN")) {
+      localStorage.setItem("HF_TOKEN", "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");
+      toast({
+        title: "API Token Set",
+        description: "Your Hugging Face API token has been configured.",
+      });
+    }
+  }, []);
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
