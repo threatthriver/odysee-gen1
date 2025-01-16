@@ -1,9 +1,13 @@
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Send, Bot, User, Loader2 } from "lucide-react";
+import { Send, Bot, User, Loader2, ArrowLeft } from "lucide-react";
 import { HfInference } from "@huggingface/inference";
 import { useToast } from "@/hooks/use-toast";
+import ReactMarkdown from 'react-markdown';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { atomDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import { Link } from "react-router-dom";
 
 interface Message {
   role: "user" | "assistant";
@@ -99,25 +103,32 @@ const Chat = () => {
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-b from-gray-900 to-gray-800">
       {/* Header */}
-      <div className="bg-gray-900/50 backdrop-blur-sm border-b border-gray-800 p-4">
-        <div className="max-w-3xl mx-auto flex items-center gap-2">
-          <Bot className="w-8 h-8 text-primary animate-pulse" />
-          <div>
-            <h1 className="text-xl font-bold text-white">Odysee Gen 1</h1>
-            <p className="text-sm text-gray-400">Powered by IntellijMind Group</p>
+      <div className="bg-gray-900/50 backdrop-blur-sm border-b border-gray-800 p-4 fixed top-0 w-full z-10">
+        <div className="max-w-3xl mx-auto flex items-center justify-between">
+          <Link to="/" className="flex items-center gap-2 text-primary hover:opacity-80 transition-opacity">
+            <ArrowLeft className="w-5 h-5" />
+            <span>Back</span>
+          </Link>
+          <div className="flex items-center gap-2">
+            <Bot className="w-8 h-8 text-primary animate-pulse" />
+            <div>
+              <h1 className="text-xl font-bold text-white">Odysee Gen 1</h1>
+              <p className="text-sm text-gray-400">Powered by IntellijMind Group</p>
+            </div>
           </div>
+          <div className="w-20" /> {/* Spacer for centering */}
         </div>
       </div>
 
       {/* Chat Area */}
-      <div className="flex-1 overflow-y-auto p-4">
-        <div className="max-w-3xl mx-auto space-y-4">
+      <div className="flex-1 overflow-y-auto p-4 pt-24 pb-32">
+        <div className="max-w-3xl mx-auto space-y-6">
           {messages.map((message, index) => (
             <div
               key={index}
               className={`flex items-start gap-3 ${
                 message.role === "user" ? "justify-end" : "justify-start"
-              }`}
+              } animate-fade-in`}
             >
               <div
                 className={`flex gap-3 max-w-[80%] ${
@@ -140,13 +151,35 @@ const Chat = () => {
                       : "bg-gray-800 text-gray-100"
                   }`}
                 >
-                  <p className="whitespace-pre-wrap">{message.content}</p>
+                  <ReactMarkdown
+                    components={{
+                      code({node, inline, className, children, ...props}) {
+                        const match = /language-(\w+)/.exec(className || '');
+                        return !inline && match ? (
+                          <SyntaxHighlighter
+                            style={atomDark}
+                            language={match[1]}
+                            PreTag="div"
+                            {...props}
+                          >
+                            {String(children).replace(/\n$/, '')}
+                          </SyntaxHighlighter>
+                        ) : (
+                          <code className={className} {...props}>
+                            {children}
+                          </code>
+                        );
+                      }
+                    }}
+                  >
+                    {message.content}
+                  </ReactMarkdown>
                 </div>
               </div>
             </div>
           ))}
           {isLoading && (
-            <div className="flex justify-start">
+            <div className="flex justify-start animate-fade-in">
               <div className="bg-gray-800 rounded-lg p-4">
                 <Loader2 className="w-5 h-5 text-primary animate-spin" />
               </div>
@@ -157,7 +190,7 @@ const Chat = () => {
       </div>
 
       {/* Input Area */}
-      <form onSubmit={handleSubmit} className="p-4 border-t border-gray-800 bg-gray-900/50 backdrop-blur-sm">
+      <form onSubmit={handleSubmit} className="p-4 border-t border-gray-800 bg-gray-900/50 backdrop-blur-sm fixed bottom-0 w-full">
         <div className="max-w-3xl mx-auto flex gap-4">
           <Textarea
             value={input}
@@ -170,7 +203,7 @@ const Chat = () => {
           <Button 
             type="submit" 
             disabled={isLoading || !input.trim()}
-            className="bg-primary hover:bg-primary/90 text-white"
+            className="bg-primary hover:bg-primary/90 text-white transition-colors"
           >
             {isLoading ? (
               <Loader2 className="w-4 h-4 animate-spin" />

@@ -1,64 +1,79 @@
+import { Link } from "react-router-dom";
+import { Bot, MessageSquare, Code, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
 
 const Index = () => {
-  const navigate = useNavigate();
-
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-gray-50">
-      <div className="container mx-auto px-4 py-16">
-        <div className="text-center max-w-3xl mx-auto">
-          <h1 className="text-5xl font-bold text-gray-900 mb-6">
-            Experience the Power of AI Chat
+    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800">
+      {/* Hero Section */}
+      <div className="container mx-auto px-4 py-20">
+        <div className="text-center space-y-8 animate-fade-in">
+          <div className="flex justify-center">
+            <Bot className="w-20 h-20 text-primary animate-pulse" />
+          </div>
+          <h1 className="text-4xl md:text-6xl font-bold text-white">
+            Meet Odysee Gen 1
           </h1>
-          <p className="text-xl text-gray-600 mb-8">
-            Engage in natural conversations with our advanced AI assistant powered by
-            state-of-the-art language models.
+          <p className="text-xl text-gray-400 max-w-2xl mx-auto">
+            Your intelligent AI companion, powered by IntellijMind Group. Experience the future of conversation.
           </p>
-          <Button
-            onClick={() => navigate("/chat")}
-            className="bg-primary hover:bg-primary/90 text-white px-8 py-6 text-lg rounded-full"
-          >
-            Start Chatting Now
-          </Button>
-        </div>
-
-        <div className="grid md:grid-cols-3 gap-8 mt-20">
-          <FeatureCard
-            title="Natural Conversations"
-            description="Engage in fluid, context-aware discussions that feel natural and intuitive."
-            icon="💬"
-          />
-          <FeatureCard
-            title="Code Understanding"
-            description="Get help with coding questions and technical discussions with ease."
-            icon="💻"
-          />
-          <FeatureCard
-            title="24/7 Availability"
-            description="Access your AI assistant whenever you need it, day or night."
-            icon="⚡"
-          />
+          <div className="flex justify-center gap-4">
+            <Link to="/chat">
+              <Button size="lg" className="animate-scale-in">
+                <MessageSquare className="mr-2" />
+                Start Chatting
+              </Button>
+            </Link>
+          </div>
         </div>
       </div>
+
+      {/* Features Section */}
+      <div className="container mx-auto px-4 py-20">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {[
+            {
+              icon: <MessageSquare className="w-8 h-8 text-primary" />,
+              title: "Natural Conversations",
+              description: "Engage in fluid, context-aware conversations with advanced language understanding."
+            },
+            {
+              icon: <Code className="w-8 h-8 text-primary" />,
+              title: "Code Support",
+              description: "Get help with coding questions with syntax highlighting and markdown support."
+            },
+            {
+              icon: <Sparkles className="w-8 h-8 text-primary" />,
+              title: "Smart Responses",
+              description: "Powered by state-of-the-art AI to provide accurate and helpful information."
+            }
+          ].map((feature, index) => (
+            <div 
+              key={index}
+              className="p-6 bg-gray-800/50 rounded-lg backdrop-blur-sm border border-gray-700 hover:border-primary transition-colors animate-fade-in"
+              style={{ animationDelay: `${index * 100}ms` }}
+            >
+              <div className="space-y-4">
+                {feature.icon}
+                <h3 className="text-xl font-semibold text-white">{feature.title}</h3>
+                <p className="text-gray-400">{feature.description}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Footer */}
+      <footer className="border-t border-gray-800 mt-20">
+        <div className="container mx-auto px-4 py-8">
+          <div className="text-center text-gray-400">
+            <p>© 2024 IntellijMind Group. All rights reserved.</p>
+            <p className="mt-2">Created by Aniket Kumar</p>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 };
-
-const FeatureCard = ({
-  title,
-  description,
-  icon,
-}: {
-  title: string;
-  description: string;
-  icon: string;
-}) => (
-  <div className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow">
-    <div className="text-4xl mb-4">{icon}</div>
-    <h3 className="text-xl font-semibold text-gray-900 mb-2">{title}</h3>
-    <p className="text-gray-600">{description}</p>
-  </div>
-);
 
 export default Index;
