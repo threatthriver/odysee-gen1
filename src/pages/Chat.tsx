@@ -153,21 +153,21 @@ const Chat = () => {
                 >
                   <ReactMarkdown
                     components={{
-                      code({node, inline, className, children, ...props}) {
+                      code({node, className, children, ...props}) {
                         const match = /language-(\w+)/.exec(className || '');
-                        return !inline && match ? (
+                        return !className ? (
+                          <code {...props} className="bg-gray-700 rounded px-1">
+                            {children}
+                          </code>
+                        ) : (
                           <SyntaxHighlighter
-                            style={atomDark}
-                            language={match[1]}
-                            PreTag="div"
                             {...props}
+                            style={atomDark}
+                            language={match?.[1] || 'text'}
+                            PreTag="div"
                           >
                             {String(children).replace(/\n$/, '')}
                           </SyntaxHighlighter>
-                        ) : (
-                          <code className={className} {...props}>
-                            {children}
-                          </code>
                         );
                       }
                     }}
