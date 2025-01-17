@@ -37,27 +37,38 @@ const Chat = () => {
 
   useEffect(() => {
     const loadChatHistory = async () => {
-      if (chatId) {
+      if (!chatId) return;
+      
+      try {
         const { data, error } = await supabase
           .from('messages')
           .select('*')
           .eq('chat_id', chatId)
           .order('timestamp', { ascending: true });
 
-        if (!error && data) {
-          setMessages(data);
-        }
+        if (error) throw error;
+        if (data) setMessages(data);
+      } catch (error) {
+        toast({
+          title: 'Error loading chat history',
+          description: 'Failed to load chat history. Please try again.',
+          variant: 'destructive',
+        });
       }
     };
 
     loadChatHistory();
-  }, [chatId, supabase]);
+  }, [chatId, supabase, toast]);
 
   const stopGeneration = () => {
     if (abortController.current) {
       abortController.current.abort();
       abortController.current = null;
       setIsLoading(false);
+      toast({
+        title: 'Generation stopped',
+        description: 'The response generation was stopped.',
+      });
     }
   };
 
@@ -79,23 +90,22 @@ const Chat = () => {
       abortController.current = new AbortController();
 
       // Save message to Supabase
-      await supabase.from('messages').insert({
-        chat_id: chatId || 'new',
-        ...newMessage
-      });
+      if (chatId) {
+        await supabase.from('messages').insert({
+          chat_id: chatId,
+          ...newMessage
+        });
+      }
 
       // API call based on selected model
-      const response = selectedModel === 'qwen' 
-        ? await fetch('/api/chat/qwen', {
-            method: 'POST',
-            body: JSON.stringify({ message: input.trim() }),
-            signal: abortController.current.signal
-          })
-        : await fetch('/api/chat/claude', {
-            method: 'POST',
-            body: JSON.stringify({ message: input.trim() }),
-            signal: abortController.current.signal
-          });
+      const response = await fetch(`/api/chat/${selectedModel}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ message: input.trim() }),
+        signal: abortController.current.signal
+      });
 
       if (!response.ok) throw new Error('Failed to get response');
 
@@ -110,23 +120,27 @@ const Chat = () => {
       setMessages(prev => [...prev, assistantMessage]);
 
       // Save assistant message to Supabase
-      await supabase.from('messages').insert({
-        chat_id: chatId || 'new',
-        ...assistantMessage
-      });
+      if (chatId) {
+        await supabase.from('messages').insert({
+          chat_id: chatId,
+          ...assistantMessage
+        });
+      }
 
     } catch (error) {
-      if (error instanceof Error && error.name === 'AbortError') {
-        toast({
-          title: 'Generation stopped',
-          description: 'The response generation was stopped.',
-        });
-      } else {
-        toast({
-          title: 'Error',
-          description: 'Failed to get response from AI.',
-          variant: 'destructive',
-        });
+      if (error instanceof Error) {
+        if (error.name === 'AbortError') {
+          toast({
+            title: 'Generation stopped',
+            description: 'The response generation was stopped.',
+          });
+        } else {
+          toast({
+            title: 'Error',
+            description: 'Failed to get response from AI.',
+            variant: 'destructive',
+          });
+        }
       }
     } finally {
       setIsLoading(false);
@@ -145,9 +159,8 @@ const Chat = () => {
     <SidebarProvider defaultOpen={true}>
       <div className="flex h-screen overflow-hidden bg-gray-900">
         <ChatSidebar />
-        
         <div className="flex-1 flex flex-col min-w-0">
-          <header className="border-b border-gray-800 p-4 bg-gray-900/95 backdrop-blur supports-[backdrop-filter]:bg-gray-900/75">
+          <header className="border-b border-gray-800 p-4 bg-gray-900/95 backdrop-blur supports-[backdrop-filter]:bg-gray-900/75 sticky top-0 z-10">
             <div className="flex items-center justify-between max-w-3xl mx-auto w-full">
               <h1 className="text-xl font-bold text-white">Chat</h1>
               <ModelSelector value={selectedModel} onChange={setSelectedModel} />
@@ -156,9 +169,16 @@ const Chat = () => {
 
           <main className="flex-1 overflow-y-auto p-4 scrollbar-thin scrollbar-thumb-gray-800 scrollbar-track-transparent">
             <div className="max-w-3xl mx-auto space-y-4">
-              {messages.map((message, index) => (
-                <ChatMessage key={index} {...message} />
-              ))}
+              {messages.length === 0 ? (
+                <div className="text-center text-gray-500 py-8">
+                  <p className="text-lg">No messages yet</p>
+                  <p className="text-sm">Start a conversation by typing a message below</p>
+                </div>
+              ) : (
+                messages.map((message, index) => (
+                  <ChatMessage key={index} {...message} />
+                ))
+              )}
               {isLoading && (
                 <div className="flex justify-start animate-fade-in">
                   <div className="bg-gray-800 rounded-lg p-4">
@@ -170,14 +190,14 @@ const Chat = () => {
             </div>
           </main>
 
-          <footer className="border-t border-gray-800 p-4 bg-gray-900/95 backdrop-blur supports-[backdrop-filter]:bg-gray-900/75">
+          <footer className="border-t border-gray-800 p-4 bg-gray-900/95 backdrop-blur supports-[backdrop-filter]:bg-gray-900/75 sticky bottom-0">
             <form onSubmit={handleSubmit} className="max-w-3xl mx-auto flex gap-4">
               <Textarea
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKeyDown}
                 placeholder="Type a message... (Press Enter to send, Shift+Enter for new line)"
-                className="resize-none bg-gray-800 border-gray-700 text-white placeholder:text-gray-400 focus:border-gray-600 focus:ring-gray-600"
+                className="resize-none bg-gray-800 border-gray-700 text-white placeholder:text-gray-400 focus:border-gray-600 focus:ring-gray-600 min-h-[60px]"
                 rows={1}
                 disabled={isLoading}
               />
@@ -187,7 +207,7 @@ const Chat = () => {
                   onClick={stopGeneration}
                   variant="destructive"
                   size="icon"
-                  className="shrink-0"
+                  className="shrink-0 h-[60px]"
                 >
                   <StopCircle className="w-4 h-4" />
                 </Button>
@@ -197,7 +217,7 @@ const Chat = () => {
                   disabled={!input.trim()}
                   variant="default"
                   size="icon"
-                  className="shrink-0 bg-primary hover:bg-primary/90"
+                  className="shrink-0 bg-primary hover:bg-primary/90 h-[60px]"
                 >
                   <Send className="w-4 h-4" />
                 </Button>

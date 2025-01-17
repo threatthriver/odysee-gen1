@@ -53,8 +53,11 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({ value, onChange })
       </PopoverTrigger>
       <PopoverContent className="w-[200px] p-0 bg-gray-800 border-gray-700">
         <Command className="bg-transparent">
-          <CommandInput placeholder="Search models..." className="text-white" />
-          <CommandEmpty className="text-gray-400">No model found.</CommandEmpty>
+          <CommandInput 
+            placeholder="Search models..." 
+            className="text-white border-none focus:ring-0"
+          />
+          <CommandEmpty className="text-gray-400 py-2">No model found.</CommandEmpty>
           <CommandGroup>
             {models.map((model) => (
               <CommandItem
@@ -64,7 +67,7 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({ value, onChange })
                   onChange(currentValue === value ? '' : currentValue);
                   setOpen(false);
                 }}
-                className="text-white hover:bg-gray-700"
+                className="text-white hover:bg-gray-700 cursor-pointer"
               >
                 <Check
                   className={cn(
@@ -72,7 +75,10 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({ value, onChange })
                     value === model.value ? "opacity-100" : "opacity-0"
                   )}
                 />
-                {model.label}
+                <div>
+                  <div>{model.label}</div>
+                  <p className="text-sm text-gray-400">{model.description}</p>
+                </div>
               </CommandItem>
             ))}
           </CommandGroup>
