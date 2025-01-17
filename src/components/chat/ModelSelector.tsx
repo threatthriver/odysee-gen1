@@ -44,19 +44,19 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({ value, onChange })
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="w-[200px] justify-between bg-gray-800 border-gray-700 text-white hover:bg-gray-700 hover:text-white"
+          className="w-[200px] justify-between bg-gray-800/90 backdrop-blur-sm border-gray-700 text-white hover:bg-gray-700 hover:text-white transition-colors"
         >
           {selectedModel?.label || "Select model..."}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[200px] p-0 bg-gray-800 border-gray-700" align="start">
+      <PopoverContent className="w-[200px] p-0 bg-gray-800/90 backdrop-blur-sm border-gray-700" align="start">
         <Command className="bg-transparent">
           <CommandInput 
             placeholder="Search models..." 
             className="text-white border-none focus:ring-0"
           />
-          <CommandEmpty className="text-gray-400 py-2">No model found.</CommandEmpty>
+          <CommandEmpty className="text-gray-400 py-2 px-2">No model found.</CommandEmpty>
           <CommandGroup className="overflow-hidden">
             {models.map((model) => (
               <CommandItem
@@ -66,7 +66,7 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({ value, onChange })
                   onChange(currentValue === value ? '' : currentValue);
                   setOpen(false);
                 }}
-                className="text-white hover:bg-gray-700 cursor-pointer"
+                className="text-white hover:bg-gray-700/50 cursor-pointer transition-colors"
               >
                 <Check
                   className={cn(

@@ -46,7 +46,15 @@ const Chat = () => {
           .eq('chat_id', chatId)
           .order('timestamp', { ascending: true });
 
-        if (error) throw error;
+        if (error) {
+          toast({
+            title: 'Error loading chat history',
+            description: error.message,
+            variant: 'destructive',
+          });
+          return;
+        }
+        
         if (data) setMessages(data);
       } catch (error) {
         toast({
@@ -89,7 +97,6 @@ const Chat = () => {
       setIsLoading(true);
       abortController.current = new AbortController();
 
-      // Save message to Supabase
       if (chatId) {
         await supabase.from('messages').insert({
           chat_id: chatId,
@@ -97,7 +104,6 @@ const Chat = () => {
         });
       }
 
-      // API call based on selected model
       const response = await fetch(`/api/chat/${selectedModel}`, {
         method: 'POST',
         headers: {
@@ -119,7 +125,6 @@ const Chat = () => {
 
       setMessages(prev => [...prev, assistantMessage]);
 
-      // Save assistant message to Supabase
       if (chatId) {
         await supabase.from('messages').insert({
           chat_id: chatId,
@@ -170,9 +175,10 @@ const Chat = () => {
           <main className="flex-1 overflow-y-auto p-4 scrollbar-thin scrollbar-thumb-gray-800 scrollbar-track-transparent">
             <div className="max-w-3xl mx-auto space-y-4">
               {messages.length === 0 ? (
-                <div className="text-center text-gray-500 py-8">
-                  <p className="text-lg">No messages yet</p>
-                  <p className="text-sm">Start a conversation by typing a message below</p>
+                <div className="text-center text-gray-500 py-16">
+                  <h2 className="text-2xl font-bold mb-2">Welcome to Chat</h2>
+                  <p className="text-lg mb-4">Start a conversation with AI</p>
+                  <p className="text-sm">Select a model and type your message below</p>
                 </div>
               ) : (
                 messages.map((message, index) => (
@@ -181,8 +187,8 @@ const Chat = () => {
               )}
               {isLoading && (
                 <div className="flex justify-start animate-fade-in">
-                  <div className="bg-gray-800 rounded-lg p-4">
-                    <Loader2 className="w-5 h-5 text-gray-300 animate-spin" />
+                  <div className="bg-gray-800/90 backdrop-blur-sm rounded-lg p-4">
+                    <Loader2 className="w-5 h-5 text-primary animate-spin" />
                   </div>
                 </div>
               )}
@@ -197,7 +203,7 @@ const Chat = () => {
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKeyDown}
                 placeholder="Type a message... (Press Enter to send, Shift+Enter for new line)"
-                className="resize-none bg-gray-800 border-gray-700 text-white placeholder:text-gray-400 focus:border-gray-600 focus:ring-gray-600 min-h-[60px]"
+                className="resize-none bg-gray-800/90 backdrop-blur-sm border-gray-700 text-white placeholder:text-gray-400 focus:border-primary focus:ring-primary min-h-[60px] transition-colors"
                 rows={1}
                 disabled={isLoading}
               />
@@ -207,7 +213,7 @@ const Chat = () => {
                   onClick={stopGeneration}
                   variant="destructive"
                   size="icon"
-                  className="shrink-0 h-[60px]"
+                  className="shrink-0 h-[60px] hover:bg-red-600/90 transition-colors"
                 >
                   <StopCircle className="w-4 h-4" />
                 </Button>
@@ -217,7 +223,7 @@ const Chat = () => {
                   disabled={!input.trim()}
                   variant="default"
                   size="icon"
-                  className="shrink-0 bg-primary hover:bg-primary/90 h-[60px]"
+                  className="shrink-0 bg-primary hover:bg-primary/90 h-[60px] transition-colors disabled:opacity-50"
                 >
                   <Send className="w-4 h-4" />
                 </Button>
