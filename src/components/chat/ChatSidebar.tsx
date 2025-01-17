@@ -13,18 +13,29 @@ interface ChatHistory {
 
 export const ChatSidebar = () => {
   const [chatHistory, setChatHistory] = React.useState<ChatHistory[]>([]);
+  const [isLoading, setIsLoading] = React.useState(true);
   const navigate = useNavigate();
   const supabase = useSupabaseClient();
 
   React.useEffect(() => {
     const fetchChatHistory = async () => {
-      const { data, error } = await supabase
-        .from('chat_history')
-        .select('*')
-        .order('created_at', { ascending: false });
-      
-      if (!error && data) {
-        setChatHistory(data);
+      try {
+        setIsLoading(true);
+        const { data, error } = await supabase
+          .from('chat_history')
+          .select('*')
+          .order('created_at', { ascending: false });
+        
+        if (error) {
+          console.error('Error fetching chat history:', error);
+          return;
+        }
+
+        setChatHistory(data || []);
+      } catch (error) {
+        console.error('Error in fetchChatHistory:', error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -46,17 +57,31 @@ export const ChatSidebar = () => {
       
       <SidebarContent className="px-4">
         <div className="space-y-2">
-          {chatHistory.map((chat) => (
-            <Button
-              key={chat.id}
-              variant="ghost"
-              className="w-full justify-start gap-2 text-left"
-              onClick={() => navigate(`/chat/${chat.id}`)}
-            >
-              <MessageSquare className="w-4 h-4" />
-              <span className="truncate">{chat.title}</span>
-            </Button>
-          ))}
+          {isLoading ? (
+            // Loading skeleton
+            Array.from({ length: 3 }).map((_, i) => (
+              <div 
+                key={i}
+                className="h-10 bg-gray-800 rounded animate-pulse"
+              />
+            ))
+          ) : chatHistory.length > 0 ? (
+            chatHistory.map((chat) => (
+              <Button
+                key={chat.id}
+                variant="ghost"
+                className="w-full justify-start gap-2 text-left"
+                onClick={() => navigate(`/chat/${chat.id}`)}
+              >
+                <MessageSquare className="w-4 h-4" />
+                <span className="truncate">{chat.title}</span>
+              </Button>
+            ))
+          ) : (
+            <div className="text-center text-gray-500 py-4">
+              No chat history
+            </div>
+          )}
         </div>
       </SidebarContent>
 
