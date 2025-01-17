@@ -8,6 +8,7 @@ import { useSupabaseClient } from '@supabase/auth-helpers-react';
 import { ChatMessage } from '@/components/chat/ChatMessage';
 import { ChatSidebar } from '@/components/chat/ChatSidebar';
 import { ModelSelector } from '@/components/chat/ModelSelector';
+import { SidebarProvider } from '@/components/ui/sidebar';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -141,65 +142,67 @@ const Chat = () => {
   };
 
   return (
-    <div className="flex h-screen bg-gray-900">
-      <ChatSidebar />
-      
-      <div className="flex-1 flex flex-col">
-        <header className="border-b border-gray-800 p-4">
-          <div className="flex items-center justify-between">
-            <h1 className="text-xl font-bold text-white">Chat</h1>
-            <ModelSelector value={selectedModel} onChange={setSelectedModel} />
-          </div>
-        </header>
+    <SidebarProvider>
+      <div className="flex h-screen bg-gray-900 w-full">
+        <ChatSidebar />
+        
+        <div className="flex-1 flex flex-col">
+          <header className="border-b border-gray-800 p-4">
+            <div className="flex items-center justify-between">
+              <h1 className="text-xl font-bold text-white">Chat</h1>
+              <ModelSelector value={selectedModel} onChange={setSelectedModel} />
+            </div>
+          </header>
 
-        <main className="flex-1 overflow-y-auto p-4">
-          <div className="max-w-3xl mx-auto space-y-4">
-            {messages.map((message, index) => (
-              <ChatMessage key={index} {...message} />
-            ))}
-            {isLoading && (
-              <div className="flex justify-start animate-fade-in">
-                <div className="bg-gray-800 rounded-lg p-4">
-                  <Loader2 className="w-5 h-5 text-gray-300 animate-spin" />
+          <main className="flex-1 overflow-y-auto p-4">
+            <div className="max-w-3xl mx-auto space-y-4">
+              {messages.map((message, index) => (
+                <ChatMessage key={index} {...message} />
+              ))}
+              {isLoading && (
+                <div className="flex justify-start animate-fade-in">
+                  <div className="bg-gray-800 rounded-lg p-4">
+                    <Loader2 className="w-5 h-5 text-gray-300 animate-spin" />
+                  </div>
                 </div>
-              </div>
-            )}
-            <div ref={messagesEndRef} />
-          </div>
-        </main>
+              )}
+              <div ref={messagesEndRef} />
+            </div>
+          </main>
 
-        <footer className="border-t border-gray-800 p-4">
-          <form onSubmit={handleSubmit} className="max-w-3xl mx-auto flex gap-4">
-            <Textarea
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder="Type a message... (Press Enter to send, Shift+Enter for new line)"
-              className="resize-none bg-gray-800 border-gray-700 text-white placeholder:text-gray-400 focus:border-gray-600 focus:ring-gray-600"
-              rows={1}
-              disabled={isLoading}
-            />
-            {isLoading ? (
-              <Button
-                type="button"
-                onClick={stopGeneration}
-                className="bg-red-600 hover:bg-red-700 text-white transition-colors"
-              >
-                <StopCircle className="w-4 h-4" />
-              </Button>
-            ) : (
-              <Button
-                type="submit"
-                disabled={!input.trim()}
-                className="bg-gray-700 hover:bg-gray-600 text-white transition-colors"
-              >
-                <Send className="w-4 h-4" />
-              </Button>
-            )}
-          </form>
-        </footer>
+          <footer className="border-t border-gray-800 p-4">
+            <form onSubmit={handleSubmit} className="max-w-3xl mx-auto flex gap-4">
+              <Textarea
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder="Type a message... (Press Enter to send, Shift+Enter for new line)"
+                className="resize-none bg-gray-800 border-gray-700 text-white placeholder:text-gray-400 focus:border-gray-600 focus:ring-gray-600"
+                rows={1}
+                disabled={isLoading}
+              />
+              {isLoading ? (
+                <Button
+                  type="button"
+                  onClick={stopGeneration}
+                  className="bg-red-600 hover:bg-red-700 text-white transition-colors"
+                >
+                  <StopCircle className="w-4 h-4" />
+                </Button>
+              ) : (
+                <Button
+                  type="submit"
+                  disabled={!input.trim()}
+                  className="bg-gray-700 hover:bg-gray-600 text-white transition-colors"
+                >
+                  <Send className="w-4 h-4" />
+                </Button>
+              )}
+            </form>
+          </footer>
+        </div>
       </div>
-    </div>
+    </SidebarProvider>
   );
 };
 
