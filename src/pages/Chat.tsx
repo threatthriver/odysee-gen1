@@ -142,19 +142,19 @@ const Chat = () => {
   };
 
   return (
-    <SidebarProvider>
-      <div className="flex h-screen bg-gray-900 w-full">
+    <SidebarProvider defaultOpen={true}>
+      <div className="flex h-screen overflow-hidden bg-gray-900">
         <ChatSidebar />
         
-        <div className="flex-1 flex flex-col">
-          <header className="border-b border-gray-800 p-4">
-            <div className="flex items-center justify-between">
+        <div className="flex-1 flex flex-col min-w-0">
+          <header className="border-b border-gray-800 p-4 bg-gray-900/95 backdrop-blur supports-[backdrop-filter]:bg-gray-900/75">
+            <div className="flex items-center justify-between max-w-3xl mx-auto w-full">
               <h1 className="text-xl font-bold text-white">Chat</h1>
               <ModelSelector value={selectedModel} onChange={setSelectedModel} />
             </div>
           </header>
 
-          <main className="flex-1 overflow-y-auto p-4">
+          <main className="flex-1 overflow-y-auto p-4 scrollbar-thin scrollbar-thumb-gray-800 scrollbar-track-transparent">
             <div className="max-w-3xl mx-auto space-y-4">
               {messages.map((message, index) => (
                 <ChatMessage key={index} {...message} />
@@ -170,7 +170,7 @@ const Chat = () => {
             </div>
           </main>
 
-          <footer className="border-t border-gray-800 p-4">
+          <footer className="border-t border-gray-800 p-4 bg-gray-900/95 backdrop-blur supports-[backdrop-filter]:bg-gray-900/75">
             <form onSubmit={handleSubmit} className="max-w-3xl mx-auto flex gap-4">
               <Textarea
                 value={input}
@@ -185,7 +185,9 @@ const Chat = () => {
                 <Button
                   type="button"
                   onClick={stopGeneration}
-                  className="bg-red-600 hover:bg-red-700 text-white transition-colors"
+                  variant="destructive"
+                  size="icon"
+                  className="shrink-0"
                 >
                   <StopCircle className="w-4 h-4" />
                 </Button>
@@ -193,7 +195,9 @@ const Chat = () => {
                 <Button
                   type="submit"
                   disabled={!input.trim()}
-                  className="bg-gray-700 hover:bg-gray-600 text-white transition-colors"
+                  variant="default"
+                  size="icon"
+                  className="shrink-0 bg-primary hover:bg-primary/90"
                 >
                   <Send className="w-4 h-4" />
                 </Button>
