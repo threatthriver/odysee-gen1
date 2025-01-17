@@ -35,6 +35,7 @@ interface ModelSelectorProps {
 
 export const ModelSelector: React.FC<ModelSelectorProps> = ({ value, onChange }) => {
   const [open, setOpen] = React.useState(false);
+  const selectedModel = models.find((model) => model.value === value);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -45,20 +46,18 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({ value, onChange })
           aria-expanded={open}
           className="w-[200px] justify-between bg-gray-800 border-gray-700 text-white hover:bg-gray-700 hover:text-white"
         >
-          {value
-            ? models.find((model) => model.value === value)?.label
-            : "Select model..."}
+          {selectedModel?.label || "Select model..."}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[200px] p-0 bg-gray-800 border-gray-700">
+      <PopoverContent className="w-[200px] p-0 bg-gray-800 border-gray-700" align="start">
         <Command className="bg-transparent">
           <CommandInput 
             placeholder="Search models..." 
             className="text-white border-none focus:ring-0"
           />
           <CommandEmpty className="text-gray-400 py-2">No model found.</CommandEmpty>
-          <CommandGroup>
+          <CommandGroup className="overflow-hidden">
             {models.map((model) => (
               <CommandItem
                 key={model.value}
