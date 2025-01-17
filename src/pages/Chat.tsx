@@ -1,26 +1,25 @@
 import { useState, useRef, useEffect, KeyboardEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Send, Bot, User, Loader2, ArrowLeft } from "lucide-react";
+import { Send, Loader2, ArrowLeft } from "lucide-react";
 import { HfInference } from "@huggingface/inference";
 import { useToast } from "@/hooks/use-toast";
-import ReactMarkdown from 'react-markdown';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { atomDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { Link } from "react-router-dom";
+import { ChatMessage } from "@/components/chat/ChatMessage";
+import { ModelSelector } from "@/components/chat/ModelSelector";
 
 interface Message {
   role: "user" | "assistant";
   content: string;
 }
 
-// Updated system prompt without signature requirement
 const systemPrompt = `You are IntellijMind AI and your name is Odysee Gen 1. You were created by IntellijMind Group and Aniket Kumar is your owner. You are a highly intelligent and sophisticated AI assistant designed to help users with a wide range of tasks. Always maintain a professional yet friendly tone.`;
 
 const Chat = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedModel, setSelectedModel] = useState("Qwen/Qwen2.5-Coder-32B-Instruct");
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
@@ -67,7 +66,7 @@ const Chat = () => {
       let response = "";
 
       const stream = await client.chatCompletionStream({
-        model: "Qwen/Qwen2.5-Coder-32B-Instruct",
+        model: selectedModel,
         messages: [
           { role: "system", content: systemPrompt },
           ...messages,
@@ -96,13 +95,15 @@ const Chat = () => {
         description: "Failed to get response from AI. Please try again.",
         variant: "destructive",
       });
+      // Remove the last message if it's empty
+      setMessages((prev) => prev.slice(0, -1));
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
+    if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSubmit();
     }
@@ -110,79 +111,38 @@ const Chat = () => {
 
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-b from-gray-900 to-gray-800">
+      {/* Header */}
       <div className="bg-gray-900/50 backdrop-blur-sm border-b border-gray-800 p-4 fixed top-0 w-full z-10">
         <div className="max-w-3xl mx-auto flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2 text-primary hover:opacity-80 transition-opacity">
+          <Link
+            to="/"
+            className="flex items-center gap-2 text-primary hover:opacity-80 transition-opacity"
+          >
             <ArrowLeft className="w-5 h-5" />
             <span>Back</span>
           </Link>
-          <div className="flex items-center gap-2">
-            <Bot className="w-8 h-8 text-primary animate-pulse" />
-            <div>
-              <h1 className="text-xl font-bold text-white">Odysee Gen 1</h1>
-              <p className="text-sm text-gray-400">Powered by IntellijMind Group</p>
-            </div>
+          <div className="w-[200px]">
+            <ModelSelector
+              selectedModel={selectedModel}
+              onModelSelect={setSelectedModel}
+            />
           </div>
-          <div className="w-20" />
         </div>
       </div>
 
+      {/* Chat Messages */}
       <div className="flex-1 overflow-y-auto p-4 pt-24 pb-32">
         <div className="max-w-3xl mx-auto space-y-6">
-          {messages.map((message, index) => (
-            <div
-              key={index}
-              className={`flex items-start gap-3 ${
-                message.role === "user" ? "justify-end" : "justify-start"
-              } animate-fade-in`}
-            >
-              <div
-                className={`flex gap-3 max-w-[80%] ${
-                  message.role === "user" ? "flex-row-reverse" : "flex-row"
-                }`}
-              >
-                <div className={`flex-shrink-0 ${
-                  message.role === "user" ? "bg-primary" : "bg-gray-700"
-                } rounded-full p-2`}>
-                  {message.role === "user" ? (
-                    <User className="w-5 h-5 text-white" />
-                  ) : (
-                    <Bot className="w-5 h-5 text-white" />
-                  )}
-                </div>
-                <div
-                  className={`rounded-lg p-4 ${
-                    message.role === "user"
-                      ? "bg-primary text-white"
-                      : "bg-gray-800 text-gray-100"
-                  }`}
-                >
-                  <ReactMarkdown
-                    components={{
-                      code({className, children, ...props}) {
-                        const match = /language-(\w+)/.exec(className || '');
-                        return !className ? (
-                          <code {...props} className="bg-gray-700 rounded px-1">
-                            {children}
-                          </code>
-                        ) : (
-                          <SyntaxHighlighter
-                            style={atomDark}
-                            language={match?.[1] || 'text'}
-                            PreTag="div"
-                          >
-                            {String(children).replace(/\n$/, '')}
-                          </SyntaxHighlighter>
-                        );
-                      }
-                    }}
-                  >
-                    {message.content}
-                  </ReactMarkdown>
-                </div>
-              </div>
+          {messages.length === 0 ? (
+            <div className="text-center text-gray-400 py-8">
+              <p className="text-lg">Welcome to Odysee Gen 1</p>
+              <p className="text-sm">Start a conversation by typing a message below.</p>
             </div>
-          ))}
+          ) : (
+            messages.map((message, index) => (
+              <ChatMessage key={index} {...message} />
+            ))
+          )}
           {isLoading && (
             <div className="flex justify-start animate-fade-in">
               <div className="bg-gray-800 rounded-lg p-4">
@@ -194,7 +154,11 @@ const Chat = () => {
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="p-4 border-t border-gray-800 bg-gray-900/50 backdrop-blur-sm fixed bottom-0 w-full">
+      {/* Input Form */}
+      <form
+        onSubmit={handleSubmit}
+        className="p-4 border-t border-gray-800 bg-gray-900/50 backdrop-blur-sm fixed bottom-0 w-full"
+      >
         <div className="max-w-3xl mx-auto flex gap-4">
           <Textarea
             value={input}
@@ -205,8 +169,8 @@ const Chat = () => {
             rows={1}
             disabled={isLoading}
           />
-          <Button 
-            type="submit" 
+          <Button
+            type="submit"
             disabled={isLoading || !input.trim()}
             className="bg-primary hover:bg-primary/90 text-white transition-colors"
           >
