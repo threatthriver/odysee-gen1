@@ -55,7 +55,6 @@ export const ModelSelector = ({ selectedModel, onModelSelect }: ModelSelectorPro
 
   const refreshModels = () => {
     setIsRefreshing(true);
-    // Simulate refresh - in a real app, this would fetch from an API
     setTimeout(() => {
       setIsRefreshing(false);
       toast({
@@ -73,7 +72,7 @@ export const ModelSelector = ({ selectedModel, onModelSelect }: ModelSelectorPro
             variant="outline"
             role="combobox"
             aria-expanded={open}
-            className="w-full justify-between bg-gray-800/50 border-gray-700 text-white hover:bg-gray-700/50"
+            className="w-full justify-between bg-gray-800/50 backdrop-blur-sm border-gray-700/50 text-white hover:bg-gray-700/50 shadow-lg transition-all duration-200"
           >
             {selectedModel
               ? models.find((model) => model.value === selectedModel)?.label
@@ -81,9 +80,9 @@ export const ModelSelector = ({ selectedModel, onModelSelect }: ModelSelectorPro
             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-[300px] p-0 bg-gray-800 border-gray-700">
+        <PopoverContent className="w-[300px] p-0 bg-gray-800/95 backdrop-blur-lg border-gray-700/50 shadow-xl">
           <Command>
-            <div className="flex items-center border-b border-gray-700 px-3">
+            <div className="flex items-center border-b border-gray-700/50 px-3">
               <Search className="mr-2 h-4 w-4 shrink-0 text-gray-400" />
               <CommandInput 
                 placeholder="Search models..." 
@@ -99,7 +98,7 @@ export const ModelSelector = ({ selectedModel, onModelSelect }: ModelSelectorPro
                   key={model.value}
                   value={model.value}
                   onSelect={() => handleModelSelect(model.value)}
-                  className="text-white hover:bg-gray-700 cursor-pointer"
+                  className="text-white hover:bg-gray-700/50 cursor-pointer transition-colors"
                 >
                   <Check
                     className={cn(
@@ -120,7 +119,7 @@ export const ModelSelector = ({ selectedModel, onModelSelect }: ModelSelectorPro
       <Button
         size="icon"
         variant="outline"
-        className="bg-gray-800/50 border-gray-700 text-white hover:bg-gray-700/50"
+        className="bg-gray-800/50 backdrop-blur-sm border-gray-700/50 text-white hover:bg-gray-700/50 shadow-lg transition-all duration-200"
         onClick={refreshModels}
         disabled={isRefreshing}
       >
