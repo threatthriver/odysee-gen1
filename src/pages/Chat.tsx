@@ -31,15 +31,23 @@ const Chat = () => {
         description: "Your Hugging Face API token has been configured.",
       });
     }
-  }, []);
+    scrollToBottom();
+  }, [messages]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
+  const handleModelSelect = (model: string) => {
+    setSelectedModel(model);
+    setMessages((prev) => [
+      ...prev,
+      {
+        role: "assistant",
+        content: `Switched to ${model}. How can I assist you?`,
+      },
+    ]);
+  };
 
   const handleSubmit = async (e?: React.FormEvent) => {
     e?.preventDefault();
@@ -95,7 +103,6 @@ const Chat = () => {
         description: "Failed to get response from AI. Please try again.",
         variant: "destructive",
       });
-      // Remove the last message if it's empty
       setMessages((prev) => prev.slice(0, -1));
     } finally {
       setIsLoading(false);
@@ -111,7 +118,6 @@ const Chat = () => {
 
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-b from-gray-900 to-gray-800">
-      {/* Header */}
       <div className="bg-gray-900/50 backdrop-blur-sm border-b border-gray-800 p-4 fixed top-0 w-full z-10">
         <div className="max-w-3xl mx-auto flex items-center justify-between">
           <Link
@@ -121,16 +127,15 @@ const Chat = () => {
             <ArrowLeft className="w-5 h-5" />
             <span>Back</span>
           </Link>
-          <div className="w-[200px]">
+          <div className="w-[300px]">
             <ModelSelector
               selectedModel={selectedModel}
-              onModelSelect={setSelectedModel}
+              onModelSelect={handleModelSelect}
             />
           </div>
         </div>
       </div>
 
-      {/* Chat Messages */}
       <div className="flex-1 overflow-y-auto p-4 pt-24 pb-32">
         <div className="max-w-3xl mx-auto space-y-6">
           {messages.length === 0 ? (
@@ -154,7 +159,6 @@ const Chat = () => {
         </div>
       </div>
 
-      {/* Input Form */}
       <form
         onSubmit={handleSubmit}
         className="p-4 border-t border-gray-800 bg-gray-900/50 backdrop-blur-sm fixed bottom-0 w-full"
